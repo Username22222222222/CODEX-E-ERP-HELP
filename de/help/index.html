@@ -1,0 +1,158 @@
+﻿<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>X-ERP Hilfe</title>
+  <meta name="description" content="Zentrale Hilfe fuer Stammdaten, Module, Ansichten und weitere Bereiche in X-ERP.">
+  <link rel="canonical" href="https://x-erp.de/de/help/">
+  <link rel="stylesheet" href="./styles.css?v=20260628-directory-tree-visible">
+  <style>
+    .help-directory-shell {
+      width: 100%;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .help-directory-hero {
+      margin-bottom: 24px;
+      padding: 28px 30px;
+      border: 1px solid var(--doc-border);
+      border-radius: 8px;
+      background: var(--doc-card);
+    }
+
+    .help-directory-hero h1 {
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+    }
+
+    .help-directory-hero p {
+      max-width: 780px;
+      color: var(--doc-muted);
+      margin-bottom: 0;
+    }
+
+    .help-directory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+    }
+
+    .help-directory-card {
+      display: flex;
+      flex-direction: column;
+      min-height: 142px;
+      padding: 18px;
+      border: 1px solid var(--doc-border);
+      border-radius: 8px;
+      background: var(--doc-card);
+      color: var(--doc-text);
+      text-decoration: none;
+      transition: border-color .15s ease, background .15s ease, transform .15s ease;
+    }
+
+    .help-directory-card:hover,
+    .help-directory-card:focus-visible {
+      border-color: var(--doc-accent);
+      background: rgba(143, 150, 159, .12);
+      transform: translateY(-1px);
+      outline: none;
+    }
+
+    .help-directory-card strong {
+      display: block;
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+    }
+
+    .help-directory-card span {
+      color: var(--doc-muted);
+      font-size: .92rem;
+      line-height: 1.45;
+    }
+
+    .help-directory-card em {
+      margin-top: auto;
+      padding-top: 14px;
+      color: var(--doc-accent-hover);
+      font-style: normal;
+      font-size: .86rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="doc-layout">
+    <aside class="doc-sidebar" id="sidebar">
+      <div class="doc-sidebar-header">
+        <h1>
+          <img src="../../assets/logo/X-ERP.png" alt="X-ERP Logo">
+          X-ERP Hilfe
+        </h1>
+        <div class="doc-search">
+          <input type="text" id="toc-search" placeholder="Suchen... (Strg+K)">
+        </div>
+      </div>
+      <nav aria-label="Hilfe-Verzeichnisse">
+        <ul class="toc-tree" id="toc"></ul>
+      </nav>
+    </aside>
+
+    <div class="overlay" id="overlay"></div>
+
+    <main class="doc-content">
+      <section class="help-directory-shell">
+        <div class="help-directory-hero">
+          <h1 id="doc-page-title">X-ERP Hilfe</h1>
+          <p id="doc-page-text">Zentrales Inhaltsverzeichnis fuer die X-ERP Hilfe. Waehlen Sie einen Bereich, um direkt in das passende Verzeichnis zu springen.</p>
+        </div>
+
+        <div class="help-directory-grid" id="help-directory-grid" aria-label="Hauptverzeichnis">
+          <a class="help-directory-card" href="/de/help/Vorwort/"><strong>Vorwort</strong><span>Einstieg und Ueberblick zur X-ERP Hilfe.</span><em>Oeffnen</em></a>
+          <a class="help-directory-card" href="/de/help/Inhaltsverzeichnis/"><strong>Inhaltsverzeichnis</strong><span>Einordnung der Dokumentationsbereiche.</span><em>Oeffnen</em></a>
+          <a class="help-directory-card" href="/de/help/Grundlagen/"><strong>Grundlagen</strong><span>Basiswissen zur Bedienung und Orientierung in X-ERP.</span><em>Oeffnen</em></a>
+          <a class="help-directory-card" href="/de/help/Stammdaten/"><strong>Stammdaten</strong><span>Zentrale Datenbereiche fuer Artikel, Partner und weitere Stammdaten.</span><em>Oeffnen</em></a>
+          <a class="help-directory-card" href="/de/help/Module/"><strong>Module</strong><span>Funktionsbereiche und Prozesse in X-ERP.</span><em>Oeffnen</em></a>
+          <a class="help-directory-card" href="/de/help/Ansichten/"><strong>Ansichten</strong><span>Bearbeitungsansichten, Listen, Assistenten und Systemmasken.</span><em>Oeffnen</em></a>
+          <a class="help-directory-card" href="/de/help/FAQ/"><strong>FAQ</strong><span>Antworten auf haeufige Fragen.</span><em>Oeffnen</em></a>
+          <a class="help-directory-card" href="/de/help/glossar/"><strong>Glossar</strong><span>Begriffe und Definitionen der X-ERP Hilfe.</span><em>Oeffnen</em></a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menue oeffnen">&#9776;</button>
+
+  <script src="./xlsx-tree.js?v=20260628-main-directory"></script>
+  <script src="./ansichten-tree.js?v=20260628-main-directory"></script>
+  <script src="./index-tree.js?v=20260628-main-directory"></script>
+  <script src="./app.js?v=20260628-main-directory"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const grid = document.getElementById('help-directory-grid');
+      const tree = Array.isArray(window.XERP_XLSX_TREE) ? window.XERP_XLSX_TREE : [];
+      if (!grid || !tree.length) return;
+
+      const describe = (node) => {
+        const childCount = Array.isArray(node.children) ? node.children.length : 0;
+        if (node.title === 'Ansichten') return 'Bearbeitungsansichten, Listen, Assistenten und Systemmasken.';
+        if (node.title === 'Glossar') return 'Begriffe und Definitionen der X-ERP Hilfe.';
+        if (node.title === 'FAQ') return 'Antworten auf haeufige Fragen.';
+        if (childCount > 0) return `${childCount} Unterbereiche in diesem Verzeichnis.`;
+        return 'Hilfeseite im Hauptverzeichnis.';
+      };
+
+      grid.innerHTML = tree
+        .filter((node) => node && node.title && node.path)
+        .map((node) => {
+          const title = String(node.title);
+          const path = String(node.path);
+          return `<a class="help-directory-card" href="${path}"><strong>${title}</strong><span>${describe(node)}</span><em>Oeffnen</em></a>`;
+        })
+        .join('');
+    });
+  </script>
+</body>
+</html>
+
+

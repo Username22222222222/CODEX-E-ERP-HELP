@@ -1,0 +1,521 @@
+/* TOC (Table of Contents) styles moved out of help.css into a dedicated file
+   Purpose: keep TOC styles isolated and easier to maintain.
+*/
+
+:root {
+    /* Max width used for the floating popup search/results experience */
+    --help-results-max: 760px;
+    /* Default width for the fixed TOC sidebar */
+    --help-toc-w: 280px;
+    /* Left offset for fixed TOC (computed by JS to align with content container) */
+    --help-fixed-left: 24px;
+}
+
+.help-toc-column {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    position: relative;
+}
+
+.help-toc-search-panel {
+    position: relative;
+    top: 0;
+    z-index: 70;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 1rem;
+    margin: 0;
+    background: linear-gradient(185deg, rgba(34,211,238,0.35), rgba(8,12,20,0.86));
+    border: 1px solid rgba(34,211,238,0.38);
+    border-radius: 14px;
+    box-shadow: 0 16px 42px -26px rgba(34,211,238,0.6), inset 0 1px 0 rgba(255,255,255,0.08);
+    box-sizing: border-box;
+}
+
+.toc-fixed .help-toc-search-panel {
+    position: sticky;
+    top: 0;
+}
+
+.help-searchbar {
+    margin-bottom: 0.6rem;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+}
+
+.help-searchbar .help-search-input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.help-searchbar--expanded {
+    margin: 0 0 1rem;
+    padding: 0;
+    width: 100%;
+    background: transparent;
+}
+
+.help-searchbar--expanded .help-search-input {
+    font-size: 1.05rem;
+    padding: 12px 16px;
+    box-sizing: border-box;
+    border-radius: 12px;
+}
+
+/* Make the TOC-local searchbar visually radiant without affecting other searchbars */
+.help-toc-search-panel .help-searchbar {
+    border: 2px solid #22d3ee !important;
+    background: linear-gradient(180deg, rgba(34,211,238,0.18), rgba(8,12,20,0.90));
+    box-shadow:
+        0 22px 60px -30px rgba(34,211,238,0.65),
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        0 0 0 4px rgba(34,211,238,0.16) !important;
+    border-radius: 12px;
+    transition: box-shadow .18s ease, border-color .18s ease, background .18s ease;
+    filter: drop-shadow(0 0 18px rgba(34,211,238,0.22));
+    position: relative;
+    overflow: visible;
+    outline: 2px solid rgba(34,211,238,0.35);
+    outline-offset: 2px;
+}
+
+.help-toc-search-panel .help-searchbar:focus-within {
+    border-color: #7df3ff !important;
+    box-shadow:
+        0 30px 80px -36px rgba(34,211,238,0.75),
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 0 0 5px rgba(34,211,238,0.22) !important;
+    background: linear-gradient(180deg, rgba(34,211,238,0.24), rgba(8,12,20,0.92));
+    filter: drop-shadow(0 0 26px rgba(34,211,238,0.28));
+}
+
+.help-toc-search-panel .help-searchbar:hover {
+    border-color: #4ee6f7 !important;
+    box-shadow:
+        0 26px 70px -34px rgba(34,211,238,0.70),
+        inset 0 1px 0 rgba(255,255,255,0.07),
+        0 0 0 4px rgba(34,211,238,0.20) !important;
+}
+
+.help-toc-search-panel .help-searchbar .help-search-input {
+    padding: 10px 12px;
+    background: rgba(8,12,20,0.55);
+    border: 0 !important;
+    border-radius: 10px;
+    box-shadow: none !important;
+    color: #22d3ee !important;
+    -webkit-text-fill-color: #22d3ee !important; /* ensure Chrome/Safari apply text color */
+}
+
+.help-toc-search-panel .help-searchbar .help-search-input:focus {
+    outline: none;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+/* Force-highlight the actual input (fallback if container styles are overridden) */
+.help-toc-search-panel #help-search-toc,
+#help-search-toc {
+    appearance: none;
+    border: 0 !important;
+    border-radius: 12px !important;
+    background: linear-gradient(180deg, rgba(8,12,20,0.92), rgba(8,12,20,0.82)) !important;
+    color: #22d3ee !important;
+    -webkit-text-fill-color: #22d3ee !important;
+    box-shadow: none !important;
+}
+
+.help-toc-search-panel #help-search-toc:focus,
+#help-search-toc:focus {
+    outline: none !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+.help-toc-search-panel #help-search-toc::placeholder,
+#help-search-toc::placeholder {
+    color: #22d3ee !important;
+}
+/* Vendor placeholders for broader support */
+.help-toc-search-panel #help-search-toc::-webkit-input-placeholder,
+#help-search-toc::-webkit-input-placeholder { color: #22d3ee !important; }
+.help-toc-search-panel #help-search-toc:-ms-input-placeholder,
+#help-search-toc:-ms-input-placeholder { color: #22d3ee !important; }
+.help-toc-search-panel #help-search-toc::-ms-input-placeholder,
+#help-search-toc::-ms-input-placeholder { color: #22d3ee !important; }
+
+/* Subtle animated glow ring to draw attention */
+.help-toc-search-panel .help-searchbar::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 16px;
+    pointer-events: none;
+    background: radial-gradient(closest-side, rgba(34,211,238,0.28), rgba(34,211,238,0.06) 60%, transparent 70%);
+    filter: blur(6px);
+    opacity: 0.75;
+    animation: helpSearchGlow 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes helpSearchGlow {
+    from { opacity: 0.55; filter: blur(5px); }
+    to   { opacity: 0.9;  filter: blur(8px); }
+}
+
+.help-layout [data-help-toc] {
+    position: relative;
+    flex: 0 0 260px;
+    max-width: 260px;
+    min-width: 240px;
+    padding-left: 0.75rem;
+}
+
+.help-toc-shell {
+    flex: 0 0 var(--help-toc-w, 280px);
+    max-width: var(--help-toc-w, 280px);
+    min-width: var(--help-toc-w, 260px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    position: relative;
+}
+
+.help-toc-column {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.help-toc {
+    width: auto;
+    margin: 0;
+    font-size: 1rem;
+    color: var(--help-muted, #b0b8d0);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 1rem;
+    background: color-mix(in srgb, var(--help-card) 92%, rgba(8,12,20,0.6) 8%);
+    border-radius: 12px;
+    box-shadow: 0 8px 40px -28px rgba(2,6,12,0.8), var(--help-glow, 0 0 0 transparent);
+    border: 1px solid var(--help-border, rgba(120,132,180,0.14));
+}
+
+.help-toc ul {
+    margin: 0;
+    padding: 0;
+}
+
+.toc-fixed .help-toc-column {
+    position: fixed;
+    left: var(--help-fixed-left, 24px);
+    top: calc(var(--header-h, 84px) + 12px);
+    width: var(--help-toc-w, 280px);
+    max-width: var(--help-toc-w, 280px);
+    height: calc(100vh - (var(--header-h, 84px) + 24px));
+    padding-right: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow: hidden;
+    z-index: 210;
+    pointer-events: auto;
+}
+
+.toc-fixed .help-toc {
+    flex: 1 1 auto;
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* Reserviere festen Platz im Layout für die Sidebar, damit nichts springt */
+.toc-fixed .help-layout [data-help-toc] {
+    flex: 0 0 var(--help-toc-w, 280px);
+    max-width: var(--help-toc-w, 280px);
+    min-width: var(--help-toc-w, 280px);
+}
+
+/* Schiebe den Hauptinhalt dauerhaft nach rechts neben die feste Sidebar */
+.toc-fixed .help-layout .help-content {
+    margin-left: calc(var(--help-toc-w, 280px) + 28px);
+}
+
+.help-toc strong {
+    font-size: 1.4em;
+    display: block;
+    letter-spacing: 0.03em;
+}
+
+.help-toc ul ul {
+    padding-left: 1.5em;
+}
+
+.help-toc li {
+    margin-bottom: 0.7em;
+}
+
+.help-toc a,
+.help-toc a:visited {
+    /* Force the same turquoise used by breadcrumbs so TOC text appears uniformly turquoise */
+    color: #22d3ee !important;
+    text-decoration: none;
+    transition: color 0.08s ease;
+    display: inline-block;
+    padding-left: 0.35rem;
+}
+
+.help-toc button[data-toc-toggle] {
+    appearance: none;
+    background: none;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0;
+    font: inherit;
+    text-align: left;
+}
+
+.help-toc-group-title button[data-toc-toggle],
+.help-toc-section-title button[data-toc-toggle],
+.help-toc-subsection-title button[data-toc-toggle] {
+    width: 100%;
+    justify-content: flex-start;
+}
+
+.help-toc button[data-toc-toggle]::before {
+    content: '>';
+    display: inline-block;
+    transform: rotate(0deg);
+    transition: transform 0.18s ease;
+    font-weight: 600;
+}
+
+.help-toc-group.is-open > .help-toc-group-title button[data-toc-toggle]::before,
+.help-toc-section.is-open > .help-toc-section-title button[data-toc-toggle]::before,
+.help-toc-subsection.is-open > .help-toc-subsection-title button[data-toc-toggle]::before {
+    transform: rotate(90deg);
+}
+
+.help-toc-group:not(.is-open) > .help-toc-sections {
+    display: none;
+}
+
+.help-toc-section:not(.is-open) > ul,
+.help-toc-subsection:not(.is-open) > ul {
+    display: none;
+}
+
+/* Keep hover/focus the same turquoise to satisfy 'einfach türkis' requirement */
+.help-toc a:hover,
+.help-toc a:focus {
+    color: #22d3ee !important;
+    text-decoration: none;
+}
+
+/* Force all text inside the TOC to use the turquoise accent so no upstream
+   rules can accidentally recolor parts of the TOC (covers nested elements). */
+.help-toc,
+.help-toc * {
+    color: #22d3ee !important;
+}
+
+@media (max-width: 900px) {
+    .help-layout [data-help-toc] {
+        flex: 1 1 auto;
+        max-width: 100%;
+        padding-left: 1.1rem;
+    }
+    .help-toc-shell,
+    .help-toc-column {
+        position: static;
+        flex: 1 1 auto;
+        max-width: 100%;
+        min-width: 0;
+        width: 100%;
+    }
+    .help-toc-search-panel {
+        position: static;
+        top: auto;
+        padding: 1rem;
+        margin-bottom: 0.9rem;
+    }
+    .help-toc {
+        border-right: none;
+        border-bottom: 2px solid var(--help-border, #7a84b4);
+        padding-right: 0;
+        margin-right: 0;
+        padding-bottom: 1.2rem;
+        margin-bottom: 1.2rem;
+        max-width: 100%;
+        position: static;
+        /* remove extra left gap on small screens */
+        margin-left: 0;
+        padding-left: 1.1rem;
+    }
+}
+
+/* Search results inserted by site.js for the TOC-local search. These are
+   rendered into the main content area and should span the full width. */
+.help-search-results:not(#help-search-toc-results) {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box;
+    margin: 0.35rem 0 1rem 0 !important;
+    padding: 0.5rem 0.75rem;
+    background: transparent;
+    clear: both;
+    float: none !important;
+    position: static !important;
+}
+.help-search-results .help-result {
+    padding: 0.6rem 0.75rem;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--help-card) 96%, transparent 4%);
+    margin-bottom: 0.5rem;
+    display: block;
+    box-shadow: 0 2px 6px -4px rgba(2,6,12,0.35);
+}
+.help-search-results .help-result p {
+    margin: 0.25rem 0 0;
+    color: var(--help-muted, #6b7280);
+    font-size: 0.95rem;
+}
+.help-search-result-link {
+    color: #0f172a; /* dark title color */
+    text-decoration: none;
+}
+.help-search-result-link strong {
+    color: #0f172a;
+}
+.help-highlight {
+    background: #22d3ee33; /* translucent turquoise */
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .help-search-results .help-result {
+        background: rgba(255,255,255,0.02);
+        box-shadow: 0 2px 8px -6px rgba(0,0,0,0.6);
+    }
+    .help-search-result-link,
+    .help-search-result-link strong {
+        color: #e6eef6;
+    }
+}
+
+/* Fullscreen-like popup overlay for wide search results under the header */
+.help-search-results-global {
+    /* Deaktiviert für Hilfe-Seiten: kein separates dunkelblaues Overlay/Band */
+    display: none !important;
+}
+
+.help-search-overlay-inner { display: none !important; }
+
+.help-search-overlay-toolbar {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 8px;
+    margin: -6px -6px 6px;
+}
+
+.help-search-close {
+    background: #0f172a;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.help-search-close:hover,
+.help-search-close:focus-visible {
+    background: #13294a;
+    transform: translateY(-1px);
+}
+
+.help-search-close-label {
+    font-size: 0.92rem;
+}
+
+.help-search-overlay-content {
+    overflow: auto;
+    flex: 1 1 auto;
+    padding-right: 4px;
+    max-height: 100%;
+    overscroll-behavior: contain;
+}
+
+.help-search-overlay-hint {
+    font-size: 0.92rem;
+    color: var(--help-muted, #9ca3af);
+    margin: -6px 0 6px 0;
+}
+
+.help-search-empty {
+    margin: 6px 0 0 0;
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: transparent; /* kein blaues Panel */
+    color: var(--help-muted, #94a3b8);
+    font-size: 0.95rem;
+}
+
+.help-search-overlay-list {
+    width: 100%;
+    box-sizing: border-box;
+    display: grid;
+    gap: 0.6rem;
+}
+
+.help-search-overlay-list .help-result {
+    width: 100%;
+    margin: 0;
+    background: #142c6f;
+}
+
+html.help-search-scroll-locked,
+body.help-search-scroll-locked {
+    overflow: hidden !important;
+    overscroll-behavior: contain;
+}
+
+html.help-search-scroll-locked {
+    height: 100%;
+}
+
+body.help-search-scroll-locked {
+    position: relative;
+    height: 100%;
+}
+
+@media (max-width: 900px) { .help-search-results-global { display:none !important; } }
+
+@media (max-width: 600px) {
+    .help-search-overlay-inner {
+        border-radius: 14px;
+        padding: clamp(14px, 4vw, 18px);
+    }
+}

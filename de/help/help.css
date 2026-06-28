@@ -1,0 +1,1696 @@
+:root {
+	--help-bg: linear-gradient(160deg, #1a1c1f 0%, #1f2226 45%, #17191c 100%);
+	--help-card: rgba(26, 28, 31, .86);
+	--help-border: rgba(141, 148, 158, .20);
+	--help-text: #e9ecf0;
+	--help-muted: rgba(210, 214, 219, .72);
+	--help-accent: #8d949e;
+	--help-accent-soft: rgba(141, 148, 158, .20);
+	--help-glow: 0 22px 60px -32px rgba(141, 148, 158, .35);
+}
+
+/* Import TOC styles from a dedicated file for easier maintenance */
+@import url("./toc.css");
+
+/* Search highlight styles (moved from inline index.html) */
+.foreword-panel[aria-label="Hilfe Suche"]{
+	border-color: rgba(141,148,158,0.35);
+	background: linear-gradient(180deg, rgba(141,148,158,0.03), rgba(15,23,42,0.35));
+	box-shadow: 0 18px 60px -30px rgba(141,148,158,0.12), inset 0 1px 0 rgba(255,255,255,0.02);
+}
+.foreword-panel[aria-label="Hilfe Suche"] .help-search-input{
+	border-color: rgba(141,148,158,0.16);
+	box-shadow: 0 6px 24px -12px rgba(141,148,158,0.08);
+	background: rgba(10,12,18,0.55);
+}
+.foreword-panel[aria-label="Hilfe Suche"] .help-search-input{
+	/* when used inside the foreword header alongside an icon */
+	width: auto;
+	flex: 1 1 auto;
+}
+.help-search-header{display:flex;align-items:center;gap:12px;margin-bottom:8px;width:100%;justify-content:center}
+.help-search-icon{flex:0 0 28px; width:28px; height:28px; display:block; margin-left:6px; margin-right:6px; opacity:0.98;}
+.help-search-icon path{stroke:var(--help-accent);}
+.help-search-icon:hover path,
+.help-search-input:focus + .help-search-icon path,
+.help-search-icon:focus{filter: drop-shadow(0 6px 18px rgba(141,148,158,0.18));}
+.help-search-icon{transition:filter .18s ease, transform .18s ease;}
+.help-search-icon:active{transform:scale(.98)}
+.foreword-panel[aria-label="Hilfe Suche"] .help-search-input:focus{
+	outline: none;
+	box-shadow: 0 8px 28px -10px rgba(141,148,158,0.18), 0 0 0 4px rgba(141,148,158,0.06);
+	border-color: rgba(141,148,158,0.5);
+}
+/* Accent the result links and chips */
+.hs-link{color:var(--help-accent)}
+.hs-link:hover{color:#d7dde4;text-decoration:underline}
+.hs-key{background:rgba(141,148,158,0.06);color:var(--help-accent)}
+.hs-item{border-left:3px solid transparent}
+.hs-item:hover{border-left-color:rgba(141,148,158,0.12)}
+
+body.help-page {
+	background: var(--help-bg);
+	color: var(--help-text);
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+	min-height: 100dvh;
+	margin: 0;
+}
+
+/* Ensure help pages use an anthracite accent so global site accent does not
+   does not recolor links inside the help area. This overrides the root
+   --accent for the scope of help pages only and keeps breadcrumb/TOC
+   color consistent. */
+body.help-page {
+    --accent: #8d949e;
+    --help-accent: #8d949e;
+}
+
+.help-layout {
+	display: flex;
+	/* slightly tighter gap so the main content gains more horizontal room */
+	gap: 0.9rem;
+	align-items: flex-start;
+}
+
+.help-hero {
+	position: relative;
+	margin: clamp(28px, 5vw, 60px) auto 0;
+	padding: clamp(28px, 4vw, 48px) clamp(24px, 5vw, 64px);
+	border-radius: 28px;
+	border: 1px solid var(--help-border);
+	background: color-mix(in srgb, var(--help-card) 94%, rgba(8, 12, 22, .55) 6%);
+	box-shadow: 0 28px 70px -48px rgba(0, 0, 0, .9);
+	text-align: center;
+	overflow: hidden;
+	isolation: isolate;
+}
+
+.help-container {
+	max-width: 1240px;
+	margin: 0 auto;
+	/* reduce the horizontal page padding so the centre column gets wider */
+	padding: 0 clamp(12px, 3vw, 28px) clamp(32px, 4vw, 56px);
+	box-sizing: border-box;
+}
+
+.help-hero::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, .08), transparent 55%);
+	mix-blend-mode: screen;
+	opacity: .35;
+	pointer-events: none;
+}
+
+.help-eyebrow {
+	display: inline-flex;
+	align-items: center;
+	gap: .6rem;
+	padding: .4rem .85rem;
+	border-radius: 999px;
+	border: 1px solid rgba(141, 148, 158, .35);
+	background: rgba(141, 148, 158, .12);
+	font-size: .85rem;
+	letter-spacing: .16em;
+	text-transform: uppercase;
+	color: var(--help-accent);
+}
+
+.help-hero h1 {
+	font-size: clamp(1.6rem, 5.2vw, 3.1rem);
+	margin: 26px 0 16px;
+	letter-spacing: .045em;
+	text-align: center;
+}
+
+.help-hero--compact {
+	padding: clamp(4px, 1.1vw, 12px) clamp(18px, 3.8vw, 48px);
+	margin-top: clamp(12px, 2.5vw, 28px);
+	/* keep the bottom gap very small so the hero sits close to the following blocks */
+	margin-bottom: 0.1rem;
+}
+
+.help-hero--compact h1 {
+	margin: clamp(6px, 1.1vw, 12px) 0 clamp(6px, 1vw, 10px);
+	font-size: clamp(1.45rem, 4.2vw, 2.6rem);
+}
+
+
+.help-hero p {
+	max-width: 960px;
+	font-size: clamp(1rem, 2vw, 1.2rem);
+	color: var(--help-muted);
+	margin: 0 0 28px;
+	line-height: 1.6;
+}
+
+.help-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+}
+
+.help-actions a {
+	display: inline-flex;
+	align-items: center;
+	gap: .65rem;
+	padding: .85rem 1.25rem;
+	border-radius: 16px;
+	border: 1px solid rgba(109, 116, 126, .30);
+	background: rgba(109, 116, 126, .20);
+	color: #fff;
+	font-weight: 600;
+	text-decoration: none;
+	transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.help-actions a:hover,
+.help-actions a:focus-visible {
+	transform: translateY(-2px);
+	border-color: rgba(109, 116, 126, .48);
+	box-shadow: 0 18px 46px -26px rgba(109, 116, 126, .62);
+	outline: none;
+}
+
+.help-grid {
+	margin-top: clamp(42px, 5vw, 60px);
+	display: grid;
+	gap: 22px;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.help-card {
+	position: relative;
+	padding: 24px;
+	border-radius: 20px;
+	border: 1px solid var(--help-border);
+	background: color-mix(in srgb, var(--help-card) 92%, rgba(8, 12, 22, .65) 8%);
+	box-shadow: 0 24px 60px -40px rgba(0, 0, 0, .88);
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	min-height: 200px;
+}
+
+.help-card h2 {
+	margin: 0;
+	font-size: 1.15rem;
+	letter-spacing: .04em;
+}
+
+.help-card p {
+	margin: 0;
+	color: var(--help-muted);
+	line-height: 1.5;
+	font-size: .95rem;
+}
+
+.help-card footer {
+	margin-top: auto;
+	display: flex;
+	gap: .75rem;
+	flex-wrap: wrap;
+}
+
+.help-pill {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: .4rem;
+	padding: .5rem 1rem;
+	min-width: 56px;
+	box-sizing: border-box;
+	border-radius: 999px;
+	border: 1px solid rgba(255, 255, 255, .18);
+	background: rgba(255, 255, 255, .08);
+	font-size: .95rem;
+	letter-spacing: .08em;
+	text-transform: uppercase;
+	color: var(--help-muted);
+}
+
+.help-search {
+	margin: clamp(48px, 5vw, 72px) auto 0;
+	padding: clamp(28px, 4vw, 48px);
+	border-radius: 24px;
+	border: 1px solid var(--help-border);
+	background: rgba(10, 14, 26, .85);
+	backdrop-filter: blur(14px) saturate(1.1);
+	box-shadow: 0 24px 70px -42px rgba(0, 0, 0, .82);
+}
+
+.help-search h2 {
+	margin: 0 0 18px;
+	letter-spacing: .04em;
+}
+
+.help-search p {
+	margin: 0 0 24px;
+	color: var(--help-muted);
+}
+
+.help-searchbar {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 14px 18px;
+	border-radius: 16px;
+	border: 1px solid rgba(255, 255, 255, .14);
+	background: rgba(8, 12, 20, .9);
+	box-shadow: inset 0 0 0 1px rgba(141, 148, 158, .06);
+}
+
+.help-searchbar input {
+	flex: 1;
+	border: none;
+	background: transparent;
+	color: var(--help-text);
+	font-size: 1rem;
+	font-family: inherit;
+}
+.help-searchbar input:focus {
+	outline: none;
+}
+
+.help-searchbar svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+}
+
+.help-reset {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	border: 1px solid rgba(255, 255, 255, .18);
+	background: rgba(255, 255, 255, .08);
+	color: var(--help-text);
+	cursor: pointer;
+	transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.help-reset:hover,
+.help-reset:focus-visible {
+	transform: translateY(-1px);
+	box-shadow: 0 12px 32px -18px rgba(109, 116, 126, .56);
+	outline: none;
+}
+
+.help-quicklinks {
+	margin-top: 26px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.help-quicklinks button {
+	border: 1px solid rgba(109, 116, 126, .36);
+	background: rgba(109, 116, 126, .18);
+	color: #fff;
+	padding: .4rem .9rem;
+	border-radius: 999px;
+	font-size: .85rem;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+}
+
+.help-quicklinks button:hover,
+.help-quicklinks button:focus-visible {
+	transform: translateY(-1px);
+	border-color: rgba(109, 116, 126, .50);
+	box-shadow: 0 12px 30px -18px rgba(109, 116, 126, .60);
+	outline: none;
+}
+
+.help-search-status {
+	margin-top: 18px;
+	color: var(--help-muted);
+	font-size: .9rem;
+}
+
+
+.help-sections {
+	margin-top: clamp(48px, 5vw, 72px);
+}
+
+/* When a compact hero immediately precedes the help sections, reduce the
+   top margin so the heading sits very close to the first section (e.g.
+   the 'FÜR EINSTEIGER' block). */
+.help-hero--compact + .help-sections {
+	margin-top: 0.25rem;
+}
+
+.help-sections h2 {
+	margin: 0 0 20px;
+	letter-spacing: .04em;
+}
+
+.help-sections p.section-lead {
+	margin: 0 0 32px;
+	color: var(--help-muted);
+	max-width: 920px;
+	line-height: 1.6;
+}
+
+
+
+.help-accordion {
+	display: grid;
+	gap: 0;
+}
+
+/* Reduce font-size by 2pt for some small section labels (Start, Basics, MasterData, Docs) */
+.help-accordion-label--smaller {
+	/* subtract 3pt from the computed 1rem baseline to make it noticeably smaller */
+	font-size: calc(1rem - 3pt);
+	/* explicit normal weight so the label is not bold */
+	font-weight: 400;
+}
+
+/* Ensure all elements inside 'FÜR' audience sections use the same smaller,
+   non-bold typography as the targeted topic labels (Countrypackages, Plugins,
+   X-ERP.*). This targets the inline label, any badge/pill and the group title. */
+.help-section--no-frame summary .help-accordion-label,
+.help-section--no-frame summary .help-badge,
+.help-section--no-frame .help-section-title {
+    font-size: calc(1rem - 3pt);
+    font-weight: 400;
+}
+
+.help-accordion-item {
+	margin: 0 0 1px;
+}
+
+/* Wider-frame variant for a few specific beginner subsections */
+.help-accordion-item--wide {
+	/* slightly larger border and radius for emphasis */
+	border-radius: 14px;
+	border: 1.9px solid rgba(141, 148, 158, .28);
+}
+.help-accordion-item--wide summary {
+	/* a touch more horizontal padding so the frame reads as wider */
+	padding-left: 18px;
+	padding-right: 18px;
+}
+.help-accordion-item--wide .panel {
+	padding-left: 18px;
+	padding-right: 18px;
+}
+
+.help-accordion-item:last-child {
+	margin-bottom: 0;
+}
+
+.help-section {
+	margin: 0;
+	padding: 0;
+}
+
+.help-section + .help-section {
+	margin-top: 12px;
+}
+
+.help-section .help-section-title {
+	margin: 0 0 8px;
+	line-height: 1.1;
+}
+
+/* Compact group titles: smaller, elegant hierarchy */
+.help-section-title--compact {
+	font-size: 0.9rem !important;
+	font-weight: 600;
+	letter-spacing: .02em;
+	margin-bottom: .5rem;
+	color: var(--help-text);
+}
+
+.help-section:first-of-type .help-section-title {
+	margin-top: 0;
+}
+
+.help-group-title {
+	margin: clamp(28px, 3.5vw, 40px) 0 10px;
+	font-size: 1.6rem;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+	color: rgba(226, 234, 255, .78);
+	font-weight: 600;
+}
+
+
+.help-accordion details {
+	position: relative;
+	overflow: hidden;
+	border-radius: 12px;
+	/* slightly thicker border for accordion panels */
+	border: 1.6px solid rgba(141, 148, 158, .28);
+	background: color-mix(in srgb, var(--help-card) 97%, rgba(8, 12, 22, .3) 3%);
+	isolation: isolate;
+	transition: border-color .18s ease;
+}
+
+.help-accordion details::after {
+	display: none;
+}
+
+.help-accordion details[open] {
+	border-color: rgba(141, 148, 158, .36);
+}
+
+#section-architecture::before {
+	mask: radial-gradient(circle, transparent calc(100% - 48px), black 100%);
+	-webkit-mask: radial-gradient(circle, transparent calc(100% - 48px), black 100%);
+}
+
+#section-architecture::after {
+	display: none;
+}
+
+.help-accordion summary {
+	list-style: none;
+	/* reduce horizontal padding so the header uses more available width */
+	padding: 2px 4px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	cursor: pointer;
+	font-weight: 600;
+	letter-spacing: .04em;
+	position: relative;
+}
+
+.help-accordion summary::-webkit-details-marker {
+	display: none;
+}
+
+.help-accordion summary .meta {
+	display: inline-flex;
+	align-items: center;
+	gap: .6rem;
+	font-size: .85rem;
+	color: var(--help-muted);
+	position: absolute;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.help-accordion summary .arrow {
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	border: 1px solid rgba(255, 255, 255, .16);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: transform .2s ease;
+}
+
+/* When the arrow contains a numeric count, make it readable */
+.help-accordion summary .arrow.arrow--count {
+	font-weight: 700;
+	font-size: 0.95rem;
+	color: var(--help-text);
+	/* Ensure the count circle stays round even for 2-digit numbers */
+	width: 28px;
+	height: 28px;
+	min-width: 28px;
+	line-height: 28px;
+	padding: 0;
+	box-sizing: border-box;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.help-accordion details[open] summary .arrow {
+	transform: rotate(90deg);
+}
+
+.help-accordion .panel {
+	/* provide a little more horizontal breathing room inside panels while
+	   keeping the overall layout wider by shrinking outer paddings */
+	padding: 0 12px 12px;
+	max-height: min(62vh, 600px);
+	overflow-y: auto;
+	border-top: 1px solid rgba(255, 255, 255, .06);
+}
+
+.help-accordion ul {
+	margin: 10px 0 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 4px;
+}
+
+.help-accordion li a {
+	display: inline-flex;
+	align-items: center;
+	gap: .5rem;
+	padding: .4rem .6rem;
+	border-radius: 10px;
+	border: 1px solid transparent;
+	color: var(--help-text);
+	text-decoration: none;
+	transition: transform .16s ease, border-color .16s ease, background .16s ease;
+}
+
+.help-accordion li a:hover,
+.help-accordion li a:focus-visible {
+	transform: translateX(2px);
+	border-color: rgba(141, 148, 158, .35);
+	background: rgba(141, 148, 158, .12);
+	text-decoration: none;
+	outline: none;
+}
+
+.help-accordion .empty {
+	margin: 22px 0 10px;
+	color: var(--help-muted);
+	font-size: .95rem;
+}
+
+.help-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: .4rem;
+	padding: .45rem .9rem;
+	min-width: 48px;
+	box-sizing: border-box;
+	border-radius: 999px;
+	border: 1px solid rgba(255, 255, 255, .12);
+	background: rgba(255, 255, 255, .06);
+	font-size: .9rem;
+	color: var(--help-muted);
+}
+
+.help-highlight {
+	background: rgba(141, 148, 158, .22) !important;
+	border-color: rgba(141, 148, 158, .5) !important;
+}
+
+@media (max-width: 720px) {
+	.help-actions {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.help-actions a {
+		justify-content: center;
+	}
+
+	.help-searchbar {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.help-reset {
+		width: 100%;
+		height: 42px;
+		border-radius: 12px;
+	}
+
+	.help-accordion summary {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.help-accordion summary .meta {
+		position: static;
+		transform: none;
+		margin-top: 8px;
+		align-self: center;
+		flex-wrap: wrap;
+	}
+}
+
+/* Login guide styling moved from inline CSS */
+body.login-guide {
+	--bg: #0f172a;
+	--surface: rgba(15, 23, 42, .88);
+	--border: rgba(148, 163, 184, .22);
+	--text: #e2e8f0;
+	--muted: rgba(226, 232, 240, .7);
+	--accent: #8d949e;
+	--accent-soft: rgba(141, 148, 158, .18);
+	--success: #34d399;
+	--shadow: 0 30px 80px -48px rgba(15, 118, 110, .55);
+	margin: 0;
+	min-height: 100vh;
+	background: radial-gradient(circle at 10% 20%, rgba(141, 148, 158, .08), transparent 55%),
+		radial-gradient(circle at 90% 10%, rgba(15, 118, 110, .12), transparent 62%),
+		linear-gradient(180deg, #0b1220 0%, #0a101c 42%, #070b13 100%);
+	font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+	color: var(--text);
+	padding: 48px 16px 64px;
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+}
+
+body.login-guide * {
+	box-sizing: border-box;
+}
+
+.login-guide .layout {
+	width: min(940px, 100%);
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: 28px;
+	box-shadow: var(--shadow);
+	overflow: hidden;
+	backdrop-filter: blur(12px) saturate(1.05);
+}
+
+.login-guide header {
+	padding: 40px clamp(20px, 5vw, 48px) 28px;
+	border-bottom: 1px solid rgba(148, 163, 184, .14);
+	background: linear-gradient(135deg, rgba(141, 148, 158, .12), transparent 65%);
+}
+
+.login-guide .eyebrow {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font-size: .85rem;
+	letter-spacing: .18em;
+	text-transform: uppercase;
+	color: var(--accent);
+	padding: 6px 12px;
+	border-radius: 999px;
+	border: 1px solid rgba(141, 148, 158, .32);
+	background: rgba(141, 148, 158, .14);
+}
+
+.login-guide h1 {
+	margin: 18px 0 14px;
+	font-size: clamp(2rem, 4.6vw, 2.8rem);
+	line-height: 1.15;
+	letter-spacing: .02em;
+}
+
+.login-guide main {
+	padding: clamp(24px, 4.6vw, 48px);
+	display: grid;
+	gap: 24px;
+}
+
+.login-guide .callout {
+	border-radius: 18px;
+	padding: 18px 22px;
+	background: linear-gradient(135deg, rgba(141, 148, 158, .12), rgba(141, 148, 158, .06));
+	border: 1px solid rgba(141, 148, 158, .22);
+	display: grid;
+	gap: 10px;
+}
+
+.login-guide .callout strong {
+	color: var(--accent);
+	font-size: 1.05rem;
+}
+
+.login-guide .steps {
+	display: grid;
+	gap: 18px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.login-guide .step {
+	border-radius: 18px;
+	border: 1px solid rgba(148, 163, 184, .18);
+	background: rgba(15, 23, 42, .72);
+	padding: 18px 22px;
+	display: grid;
+	gap: 6px;
+}
+
+.login-guide .step-number {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	background: rgba(141, 148, 158, .18);
+	border: 1px solid rgba(141, 148, 158, .32);
+	color: var(--accent);
+	font-weight: 700;
+	font-size: .95rem;
+	letter-spacing: .04em;
+}
+
+.login-guide .step-header {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.login-guide .step h2 {
+	margin: 0;
+	font-size: 1.15rem;
+	letter-spacing: .04em;
+}
+
+.login-guide .step p {
+	margin: 0;
+	color: var(--muted);
+	line-height: 1.55;
+}
+
+.login-guide .hint {
+	margin-top: 6px;
+	padding: 12px 16px;
+	border-radius: 14px;
+	background: rgba(52, 211, 153, .13);
+	border: 1px solid rgba(52, 211, 153, .35);
+	color: rgba(203, 250, 222, .95);
+	font-size: .95rem;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+
+.login-guide .actions {
+	display: flex;
+	justify-content: center;
+	padding: 18px 28px 40px;
+	border-top: 1px solid rgba(148, 163, 184, .14);
+	background: linear-gradient(180deg, rgba(15, 23, 42, .36), rgba(11, 18, 32, .6));
+}
+
+.login-guide .back-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	padding: 14px 28px;
+	border-radius: 999px;
+	border: 1px solid rgba(141, 148, 158, .32);
+	background: rgba(141, 148, 158, .18);
+	color: var(--accent);
+	text-decoration: none;
+	text-transform: uppercase;
+	letter-spacing: .12em;
+	font-weight: 700;
+	font-size: .9rem;
+	transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.login-guide .back-btn:hover,
+.login-guide .back-btn:focus-visible {
+	transform: translateY(-2px);
+	background: rgba(141, 148, 158, .26);
+	border-color: rgba(141, 148, 158, .52);
+	outline: none;
+}
+
+@media (max-width: 640px) {
+	.login-guide .layout {
+		border-radius: 22px;
+	}
+
+	.login-guide header {
+		padding: 32px 24px 20px;
+	}
+
+	.login-guide main {
+		padding: 24px;
+	}
+
+	.login-guide .actions {
+		padding: 24px;
+	}
+}
+
+/* Help template layout (TOC styles moved to toc.css) */
+
+.help-breadcrumbs {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 1.1rem;
+	margin: 2rem 0 1.5rem 0;
+	color: var(--help-muted, #b0b8d0);
+}
+
+.help-breadcrumbs a {
+	color: var(--help-accent, #8d949e);
+	text-decoration: none;
+	font-weight: 500;
+}
+
+.help-breadcrumbs .sep {
+	color: var(--help-border, #7a84b4);
+	/* TOC styles were moved to de/help/toc.css to keep help.css smaller and focused */
+	color: var(--help-text, #e6ebff);
+}
+
+.help-content {
+	flex: 1 1 0%;
+	/* slightly reduce left padding so the accordion can expand */
+	padding-left: 1rem;
+	display: flex;
+	flex-direction: column;
+	gap: 2.5rem;
+	min-width: 0;
+}
+
+.help-image-annotated {
+	display: block;
+	width: min(100%, 1024px);
+	margin: 0 0 1.5rem 0;
+	border-radius: 18px;
+	box-shadow: 0 8px 32px -12px rgba(141, 148, 158, .18);
+	position: relative;
+	cursor: zoom-in;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.help-image-annotated.is-expanded {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: auto;
+	max-width: min(90vw, 1400px);
+	max-height: 90vh;
+	z-index: 2100;
+	box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.65);
+	cursor: zoom-out;
+}
+
+.help-image-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(5, 10, 18, 0.78);
+	backdrop-filter: blur(4px);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s ease;
+	z-index: 2050;
+}
+
+.help-image-overlay.is-active {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.help-annotations {
+	display: flex;
+	flex-direction: column;
+	gap: 0.7rem;
+	margin: 0 0 1.5rem 0;
+}
+
+.help-annotation {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.7em;
+	font-size: 1.08rem;
+}
+
+
+.help-annotation a {
+	color: var(--help-text, #e6ebff);
+	text-decoration: none;
+	font-weight: 500;
+	display: inline-flex;
+	align-items: center;
+	transform-origin: left center;
+	transition: transform 0.15s ease;
+}
+
+.help-annotation a:hover,
+.help-annotation a:focus-visible {
+	transform: scale(1.06);
+	text-decoration: none;
+	outline: none;
+}
+
+.help-annotation-number {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.7em;
+	height: 1.7em;
+	background: var(--help-accent, #8d949e);
+	color: #0a0d18;
+	font-weight: 700;
+	border-radius: 50%;
+	font-size: 1.1em;
+	margin-right: 0.5em;
+	box-shadow: 0 2px 8px rgba(141, 148, 158, .12);
+}
+
+.help-annotation-explanation-number {
+	width: 1.6em;
+}
+
+.help-annotation-explanations {
+	margin: 1.9rem 0 0;
+	/* Align the explanation box width with the annotated image frame */
+	width: min(100%, 1024px);
+	box-sizing: border-box;
+	padding: 1.6rem clamp(1.2rem, 2vw, 2rem);
+	border: 1px solid var(--help-border, #7a84b4);
+	border-radius: 18px;
+	background: color-mix(in srgb, var(--help-card, rgba(15, 23, 42, .82)) 95%, rgba(6, 10, 20, .65) 5%);
+	display: grid;
+	gap: 1.4rem;
+}
+
+.help-annotation-explanation {
+	display: grid;
+	gap: 0.45rem;
+	scroll-margin-top: clamp(80px, 12vh, 140px);
+}
+
+.help-annotation-explanation-number {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.6em;
+	height: 1.6em;
+	margin-right: 0.55rem;
+	border-radius: 50%;
+	border: 1px solid rgba(141, 148, 158, .45);
+	background: rgba(141, 148, 158, .12);
+	color: var(--help-accent, #8d949e);
+	font-weight: 700;
+	font-size: 0.95em;
+	box-shadow: inset 0 0 0 1px rgba(141, 148, 158, .18);
+}
+
+.help-annotation-explanation dt {
+	margin: 0;
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+	font-weight: 600;
+	letter-spacing: .03em;
+}
+
+.help-annotation-explanation dd {
+	margin: 0 0 0 calc(1.6em + 1.15rem);
+	color: var(--help-muted, rgba(226, 234, 255, .65));
+	line-height: 1.6;
+	font-size: 1rem;
+}
+
+.help-annotation-callout {
+	margin: 1.8rem 0 2.4rem;
+	/* Match the annotated image frame width so callouts align with the image */
+	width: min(100%, 1024px);
+	box-sizing: border-box;
+	padding: 1.4rem clamp(1.2rem, 2vw, 1.8rem);
+	border-radius: 20px;
+	border: 1.5px solid rgba(241, 196, 15, .5);
+	background: rgba(241, 196, 15, .12);
+	box-shadow: 0 24px 48px -28px rgba(241, 196, 15, .3);
+	display: grid;
+	gap: 0.75rem;
+}
+
+.help-annotation-callout-header {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.8rem;
+	font-weight: 700;
+	color: #f1c40f;
+	text-transform: uppercase;
+	letter-spacing: .08em;
+}
+
+.help-annotation-callout-icon {
+	font-size: 1.4rem;
+}
+
+.help-annotation-callout-label {
+	font-size: 1rem;
+}
+
+.help-annotation-callout-text {
+	margin: 0;
+	color: var(--help-text, #e6ebff);
+	line-height: 1.6;
+}
+
+.help-annotation-callout-list {
+	margin: 0;
+	padding-left: 1.4rem;
+	color: var(--help-text, #e6ebff);
+	display: grid;
+	gap: 0.6rem;
+}
+
+.help-annotation-callout-list li {
+	line-height: 1.6;
+}
+
+/* Green field properties panel and table */
+.help-field-props {
+	margin: 1.2rem 0 2.2rem;
+	/* align with annotated image width */
+	width: min(100%, 1024px);
+	box-sizing: border-box;
+	padding: 1.2rem clamp(1rem, 2vw, 1.6rem);
+	border-radius: 18px;
+	border: 1.6px solid rgba(52, 211, 153, .45);
+	background: linear-gradient(180deg, rgba(52, 211, 153, .14), rgba(15,23,42,.78));
+	box-shadow: 0 22px 48px -28px rgba(16, 185, 129, .28);
+	display: grid;
+	gap: 0.8rem;
+}
+
+.help-field-props-header {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.7rem;
+	font-weight: 700;
+	color: #34d399;
+	letter-spacing: .06em;
+	text-transform: uppercase;
+}
+
+.help-field-props-icon { font-size: 1.3rem; }
+.help-field-props-label { font-size: 0.95rem; }
+
+.help-field-props-table-wrap { overflow-x: auto; }
+
+.help-field-props-table {
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid rgba(52, 211, 153, .28);
+	background: color-mix(in srgb, var(--help-card) 96%, rgba(34,197,94,.06) 4%);
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.help-field-props-table th,
+.help-field-props-table td {
+	padding: 10px 12px;
+	border-bottom: 1px solid rgba(255,255,255,.08);
+	text-align: left;
+	font-size: 0.96rem;
+}
+
+.help-field-props-table thead th {
+	background: rgba(52, 211, 153, .12);
+	border-bottom-color: rgba(52,211,153,.35);
+	color: rgba(203, 250, 222, .95);
+	font-weight: 700;
+}
+
+.help-field-props-table tbody tr:nth-child(odd) td {
+	background: rgba(52, 211, 153, .06);
+}
+
+.help-field-props-table .col--label { min-width: 180px; font-weight: 600; }
+.help-field-props-table .col--field { color: var(--help-muted); font-family: ui-monospace, Menlo, Consolas, monospace; }
+.help-field-props-table .col--type { white-space: nowrap; }
+.help-field-props-table .col--required { text-align: center; width: 80px; font-weight: 700; }
+.help-field-props-table .col--required.required-yes { color: #ef4444; text-shadow: 0 0 8px rgba(239,68,68,.35); }
+.help-field-props-table .col--required.required-no { color: rgba(226,234,255,.55); font-weight: 600; }
+.help-field-props-table .col--note { color: var(--help-muted); }
+
+.help-register {
+	margin: 1.75rem 0 0 0;
+	padding: 1.15rem 1.5rem;
+	width: min(100%, 1024px);
+	box-sizing: border-box;
+	border-radius: 14px;
+	border: 1.5px solid rgba(255,255,255,0.08);
+	background: linear-gradient(180deg, rgba(15,23,42,0.92), rgba(15,23,42,0.72));
+	box-shadow: 0 22px 52px -32px rgba(15,23,42,0.85);
+}
+
+.help-register-title {
+	margin: 0 0 0.75rem 0;
+	font-size: 0.88rem;
+	font-weight: 700;
+	letter-spacing: .1em;
+	text-transform: uppercase;
+	color: var(--help-muted, #9ca3c7);
+}
+
+.help-register-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 0.55rem;
+}
+
+.help-register-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.25rem 0.5rem;
+	border-radius: 6px;
+	color: var(--help-text, #f4f7ff);
+	text-decoration: none;
+	font-weight: 600;
+	transition: color .15s ease, background .15s ease, transform .15s ease;
+}
+
+.help-register-link::before {
+	content: '↗';
+	font-size: 0.72rem;
+	color: var(--help-accent, #8d949e);
+	opacity: 0.75;
+	transform: translateY(-1px);
+}
+
+.help-register-link:hover {
+	color: #ffffff;
+	background: rgba(141,148,158,0.12);
+}
+
+.help-register-link.is-active {
+	background: rgba(141,148,158,0.2);
+	color: var(--help-accent, #8d949e);
+	cursor: default;
+}
+
+.help-register-link.is-active::before {
+	content: '●';
+	font-size: 0.54rem;
+	transform: translateY(0);
+}
+
+.help-links {
+	margin: 2.5rem 0 0 0;
+	padding: 1.2rem 0 0 0;
+	/* keep the top border only as wide as the annotated image frame */
+	width: min(100%, 1024px);
+	box-sizing: border-box;
+	border-top: 1.5px solid var(--help-border, #7a84b4);
+	display: flex;
+	flex-direction: column;
+	gap: 0.7rem 0;
+	font-size: 1.08rem;
+}
+
+.help-links a {
+	color: var(--help-accent, #8d949e);
+	text-decoration: none;
+	font-weight: 500;
+	transition: color 0.15s;
+}
+
+.help-links a:hover {
+	color: var(--help-text, #e6ebff);
+}
+
+body.help-page .doc-content {
+	padding: 32px 56px 40px;
+	background:
+		radial-gradient(circle at top right, rgba(141, 148, 158, .07), transparent 28%),
+		radial-gradient(circle at 20% 0%, rgba(16, 185, 129, .05), transparent 24%),
+		var(--help-bg, #101222);
+}
+
+body.help-page .doc-content section {
+	margin-bottom: 0;
+	padding-bottom: 0;
+	border-bottom: 0;
+}
+
+.help-page-shell {
+	display: grid;
+	gap: 1.8rem;
+	max-width: 1120px;
+	width: 100%;
+}
+
+.help-view-hero,
+.help-view-panel {
+	position: relative;
+	padding: 1.4rem 1.5rem;
+	border-radius: 22px;
+	border: 1px solid var(--help-border, rgba(120, 132, 180, .18));
+	background: color-mix(in srgb, var(--help-card, rgba(15, 23, 42, .82)) 92%, rgba(8, 12, 22, .76) 8%);
+	box-shadow: 0 24px 60px -42px rgba(0, 0, 0, .72);
+}
+
+body.help-page .doc-content .help-view-hero,
+body.help-page .doc-content .help-view-panel {
+	padding: 1.4rem 1.5rem 2rem;
+}
+
+.help-view-hero::before,
+.help-view-panel::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	pointer-events: none;
+	background: linear-gradient(180deg, rgba(255,255,255,.06), transparent 22%);
+	opacity: .85;
+}
+
+.help-view-eyebrow {
+	display: inline-flex;
+	align-items: center;
+	gap: .45rem;
+	padding: .35rem .8rem;
+	border-radius: 999px;
+	border: 1px solid rgba(141, 148, 158, .35);
+	background: rgba(141, 148, 158, .12);
+	color: var(--help-accent, #8d949e);
+	font-size: .8rem;
+	letter-spacing: .14em;
+	text-transform: uppercase;
+	font-weight: 700;
+}
+
+.help-view-hero-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1.35rem;
+	align-items: start;
+	margin-top: 1rem;
+}
+
+.help-view-hero h1 {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: clamp(2rem, 3.8vw, 3.35rem);
+	line-height: 1.08;
+	letter-spacing: .02em;
+}
+
+.help-view-summary {
+	margin: .9rem 0 0;
+	max-width: 62ch;
+	font-size: 1.06rem;
+	line-height: 1.7;
+	color: var(--help-muted, rgba(226, 234, 255, .65));
+}
+
+.help-view-hero-card {
+	padding: 1.15rem 1.2rem 1.4rem;
+	margin-top: .1rem;
+	border-radius: 18px;
+	border: 1px solid rgba(141, 148, 158, .16);
+	background: rgba(141, 148, 158, .05);
+	box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+	position: relative;
+	z-index: 1;
+}
+
+.help-view-hero-card h2,
+.help-view-panel h2 {
+	margin: 0 0 .6rem;
+	padding: 0;
+	border: 0;
+	font-size: 1.18rem;
+	line-height: 1.25;
+}
+
+.help-view-hero-card p,
+.help-view-panel p {
+	margin: .15rem 0 .2rem;
+	color: var(--help-text, #e6ebff);
+	line-height: 1.85;
+}
+
+.help-view-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .65rem;
+	margin-top: 1rem;
+	justify-content: flex-start;
+}
+
+.help-view-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 1.2rem;
+}
+
+.help-view-callout {
+	margin: 0;
+	width: auto;
+	align-self: stretch;
+}
+
+.help-view-grid > * {
+	width: 100%;
+}
+
+.help-view-section-head {
+	position: relative;
+	z-index: 1;
+	margin-bottom: 1rem;
+}
+
+.help-view-section-head p {
+	color: var(--help-muted, rgba(226, 234, 255, .65));
+	margin-top: .35rem;
+	max-width: 76ch;
+}
+
+.help-view-shot-panel {
+	display: grid;
+	gap: 1rem;
+}
+
+.help-view-shot {
+	position: relative;
+	z-index: 1;
+	margin: 0;
+}
+
+.help-view-shot img {
+	display: block;
+	width: 100%;
+	max-width: 1120px;
+	border-radius: 18px;
+	border: 1px solid rgba(255,255,255,.08);
+	box-shadow: 0 20px 55px -36px rgba(0, 0, 0, .9);
+}
+
+.help-view-shot figcaption {
+	margin-top: .75rem;
+	color: var(--help-muted, rgba(226, 234, 255, .65));
+	font-size: .95rem;
+}
+
+.help-view-fields {
+	display: grid;
+	gap: .9rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	position: relative;
+	z-index: 1;
+}
+
+.help-view-fields li {
+	padding: 1rem 1.05rem;
+	border-radius: 16px;
+	border: 1px solid rgba(255,255,255,.08);
+	background: rgba(255,255,255,.03);
+	box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+.help-view-fields li::before {
+	content: counter(field-item);
+	counter-increment: field-item;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.8rem;
+	height: 1.8rem;
+	margin-bottom: .85rem;
+	border-radius: 999px;
+	background: rgba(141, 148, 158, .14);
+	border: 1px solid rgba(141, 148, 158, .28);
+	color: var(--help-accent, #8d949e);
+	font-weight: 800;
+	font-size: .95rem;
+}
+
+.help-view-fields {
+	counter-reset: field-item;
+}
+
+.help-view-fields h3 {
+	margin: 0 0 .45rem;
+	font-size: 1.04rem;
+	line-height: 1.25;
+}
+
+.help-view-fields p {
+	color: var(--help-muted, rgba(226, 234, 255, .65));
+	margin: 0;
+}
+
+.help-register-explain-panel {
+	display: grid;
+	gap: 1rem;
+}
+
+.help-register-explain-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+	gap: .85rem;
+	position: relative;
+	z-index: 1;
+}
+
+.help-register-explain-item {
+	padding: .95rem 1rem;
+	border-radius: 14px;
+	border: 1px solid rgba(141, 148, 158, .18);
+	background: rgba(255,255,255,.03);
+	box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+.help-register-explain-item.is-active {
+	border-color: rgba(141, 148, 158, .36);
+	background: rgba(141, 148, 158, .12);
+	box-shadow: 0 10px 26px -16px rgba(141, 148, 158, .42), inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.help-register-explain-item h3 {
+	margin: 0 0 .45rem;
+	font-size: 1rem;
+	line-height: 1.3;
+	letter-spacing: .015em;
+}
+
+.help-register-explain-item p {
+	margin: 0;
+	line-height: 1.6;
+	color: var(--help-muted, rgba(226, 234, 255, .65));
+}
+
+.help-view-panel strong {
+	color: var(--help-text, #e6ebff);
+}
+
+.help-view-panel + .help-view-panel {
+	margin-top: 0;
+}
+
+.static-help-content {
+	display: grid;
+	gap: 1rem;
+}
+
+.static-help-content h2,
+.static-help-content h3 {
+	margin: .35rem 0 0;
+	line-height: 1.25;
+}
+
+.static-help-content h2 {
+	font-size: clamp(1.45rem, 2vw, 2rem);
+}
+
+.static-help-content h3 {
+	font-size: clamp(1.15rem, 1.5vw, 1.35rem);
+	color: var(--help-text, #e6ebff);
+}
+
+.static-help-content p,
+.static-help-content li {
+	color: var(--help-text, #e6ebff);
+	line-height: 1.75;
+}
+
+.static-help-content ul {
+	margin: 0;
+	padding-left: 1.25rem;
+	display: grid;
+	gap: .45rem;
+}
+
+.static-help-content ol {
+	margin: 0;
+	padding-left: 1.5rem;
+	display: grid;
+	gap: .45rem;
+}
+
+.static-help-box {
+	margin: 1rem 0;
+	padding: 1rem 1.1rem;
+	border: 1px solid rgba(255, 255, 255, .10);
+	border-radius: 8px;
+	background: rgba(255, 255, 255, .035);
+	box-shadow: 0 14px 36px -28px rgba(0, 0, 0, .85);
+}
+
+.static-help-box h3 {
+	margin: 0 0 .55rem;
+	font-size: 1.02rem;
+	line-height: 1.35;
+	color: #f3f4f6;
+}
+
+.static-help-box p:last-child,
+.static-help-box ul:last-child,
+.static-help-box ol:last-child {
+	margin-bottom: 0;
+}
+
+.static-help-figure {
+	margin: .35rem 0 .1rem;
+}
+
+.static-help-figure img {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	height: auto;
+	border-radius: 8px;
+	border: 1px solid rgba(226, 232, 240, .14);
+	background: #161616;
+	box-shadow: 0 22px 56px -34px rgba(0, 0, 0, .78);
+}
+
+.static-help-content a {
+	color: var(--help-accent, #8ab4f8);
+	text-decoration: none;
+	font-weight: 700;
+}
+
+.static-help-content li > a {
+	display: inline-flex;
+	align-items: center;
+	gap: .38rem;
+	padding: .16rem .52rem;
+	margin: -.08rem 0;
+	border-radius: 999px;
+	border: 1px solid rgba(226, 232, 240, .18);
+	background: rgba(226, 232, 240, .07);
+	color: #dfe7ef;
+	box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.static-help-content li > a::after {
+	content: ">";
+	font-size: .9em;
+	font-weight: 800;
+	color: var(--help-accent, #8ab4f8);
+	opacity: .72;
+}
+
+.static-help-content a:hover {
+	text-decoration: none;
+	background: rgba(226, 232, 240, .11);
+	border-color: rgba(226, 232, 240, .32);
+	color: #ffffff;
+}
+
+.static-help-separator {
+	border: 0;
+	border-top: 1px solid rgba(141,148,158,.24);
+	margin: .4rem 0;
+}
+
+@media (max-width: 980px) {
+	body.help-page .doc-content {
+		padding: 24px 18px 32px;
+	}
+
+	.help-view-hero-grid,
+	.help-view-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 900px) {
+	.help-layout {
+		flex-direction: column;
+	}
+	.help-content {
+		padding-left: 0;
+	}
+}
+
+/* Row layout for all 'FÜR ...' groups */
+.help-groups-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	margin: 1.25rem 0;
+}
+.help-groups-row > .help-section {
+	/* slightly slimmer cards for the 'FÜR ...' group */
+	flex: 1 1 180px;
+	min-width: 160px;
+	/* reduce horizontal padding to give more usable interior width */
+	padding: 12px 6px;
+	border-radius: 12px;
+	background: color-mix(in srgb, var(--help-card) 96%, rgba(255,255,255,0.02) 4%);
+	/* thicker frame for more visual weight */
+	border: 1.8px solid rgba(255,255,255,0.06);
+	box-shadow: 0 8px 30px -18px rgba(0,0,0,0.6);
+	transition: transform .16s ease, box-shadow .18s ease;
+	display: flex;
+	flex-direction: column;
+}
+.help-groups-row > .help-section:hover {
+	transform: translateY(-6px);
+	box-shadow: 0 22px 60px -32px rgba(141,148,158,0.06);
+	border-color: rgba(141,148,158,0.08);
+}
+/* Remove outer frame/background for a specific section (modifier class) */
+.help-section--no-frame {
+	background: transparent !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+	padding: 6px !important;
+}
+/* For a group wrapper marked no-frame, only remove the outer container's
+   visual chrome (background/border/shadow). Leave inner accordion details
+   (the <details> / <summary> / .panel) untouched so the accordion keeps
+   its framed appearance and affordance. */
+.help-section--no-frame {
+	background: transparent !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
+	padding: 6px !important;
+}
+
+/* Note: Inner <details> elements are intentionally not targeted here so
+   they retain their borders/background defined by .help-accordion details.
+   If an individual audience should hide its badge, that is controlled
+   by the JS that removes the badge element for those sections. */
+@media (max-width: 640px) {
+	.help-groups-row { flex-direction: column; }
+	.help-groups-row > .help-section { min-width: 0; }
+}
+
+/* On wide screens, arrange up to 6 'FÜR ...' cards in a single row */
+@media (min-width: 1024px) {
+	.help-groups-row {
+		/* ensure row consumes full width of container */
+		display: flex;
+		flex-wrap: nowrap;
+		justify-content: space-between;
+	}
+	.help-groups-row > .help-section {
+		/* six equal columns, account for gap between them (5 * 1rem) */
+		flex: 0 0 calc((100% - 5rem) / 6);
+		max-width: calc((100% - 5rem) / 6);
+	}
+}
