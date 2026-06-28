@@ -9,7 +9,7 @@ from urllib.parse import quote, unquote
 
 HELP_ROOT = Path(r"D:\DATEN\HOMEPAGES\x-erp.de\de\help")
 TREE_JSON = HELP_ROOT / "xlsx-tree.json"
-SCRIPT_VERSION = "20260628-aufbau-children-grundlagen"
+SCRIPT_VERSION = "20260628-logout-after-assistent"
 HELP_CSS_VERSION = "20260628-static-help-boxes"
 CSS_VERSION = "20260627-screenshot-width"
 
