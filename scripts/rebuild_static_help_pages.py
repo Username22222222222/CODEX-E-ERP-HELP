@@ -9,8 +9,8 @@ from urllib.parse import quote, unquote
 
 HELP_ROOT = Path(r"D:\DATEN\HOMEPAGES\x-erp.de\de\help")
 TREE_JSON = HELP_ROOT / "xlsx-tree.json"
-SCRIPT_VERSION = "20260628-stammdaten-quality"
-HELP_CSS_VERSION = "20260628-stammdaten-quality"
+SCRIPT_VERSION = "20260628-customizing-quality"
+HELP_CSS_VERSION = "20260628-customizing-quality"
 CSS_VERSION = "20260627-screenshot-width"
 REDIRECTS = {}
 
