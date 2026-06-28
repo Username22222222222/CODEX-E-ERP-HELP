@@ -2,6 +2,7 @@
 
 import html
 import json
+import os
 import re
 import shutil
 from dataclasses import dataclass, field
@@ -16,6 +17,7 @@ WORKBOOK = Path(r"C:\Users\micha\Documents\X-ERP-HELP\X-ERP-HELP.xlsx")
 HELP_ROOT = Path(r"D:\DATEN\HOMEPAGES\x-erp.de\de\help")
 TARGET_ROOT = HELP_ROOT / "Ansichten"
 BASE_URL = "https://x-erp.de/de/help/Ansichten"
+ASSET_VERSION = "20260628-all-stammdaten-fields"
 
 
 @dataclass
@@ -292,7 +294,22 @@ def tab_purpose(node: Node) -> str | None:
 
 
 def clean_description(value: str, node: Node) -> str:
-    result = re.sub(r"\s+", " ", value or "").strip()
+    lines: list[str] = []
+    for raw_line in (value or "").replace("\r\n", "\n").replace("\r", "\n").split("\n"):
+        line = raw_line.strip()
+        if not line:
+            continue
+        if line.startswith(":::"):
+            continue
+        if line.startswith("#"):
+            line = line.lstrip("#").strip()
+            if line.casefold() == node.topic.casefold():
+                continue
+        if line.startswith(("- ", "* ")):
+            line = line[2:].strip()
+        line = line.replace("`", "")
+        lines.append(line)
+    result = re.sub(r"\s+", " ", " ".join(lines)).strip()
     if not result:
         return ""
     result = result.replace("Die Erklärung ist für Anwender und die ERP-Dokumentation optimiert.", "")
@@ -418,9 +435,17 @@ def read_nodes() -> list[Node]:
         )
         nodes.append(node)
 
+    by_breadcrumb = {node.breadcrumb: node for node in nodes if node.breadcrumb}
     stack: dict[int, Node] = {}
     for node in nodes:
-        parent = stack.get(node.level - 1)
+        parent = None
+        if ">" in node.breadcrumb:
+            parent_breadcrumb = " > ".join(part.strip() for part in node.breadcrumb.split(">")[:-1])
+            parent = by_breadcrumb.get(parent_breadcrumb)
+            if parent is node:
+                parent = None
+        if parent is None:
+            parent = stack.get(node.level - 1)
         node.parent = parent
         if parent:
             parent.children.append(node)
@@ -433,6 +458,8 @@ def read_nodes() -> list[Node]:
 
 
 def is_page(node: Node) -> bool:
+    if node.content_type == "HelpPage":
+        return True
     if node.level <= 3:
         return True
     if node.topic.endswith("List"):
@@ -481,15 +508,12 @@ def assign_paths(nodes: list[Node]) -> list[Node]:
 def rel_link(from_node: Node, to_node: Node) -> str:
     if from_node.fs_dir is None or to_node.fs_dir is None:
         return "#"
-    rel = Path(".") if from_node.fs_dir == to_node.fs_dir else Path(
-        *Path(to_node.fs_dir).relative_to(TARGET_ROOT).parts
-    )
-    from_rel = Path(from_node.fs_dir).relative_to(TARGET_ROOT)
-    depth = len(from_rel.parts)
-    prefix = Path(*([".."] * depth)) if depth else Path(".")
     if to_node is page_root:
-        return (prefix / "").as_posix() + "/"
-    return (prefix / rel).as_posix() + "/"
+        return "/de/help/Ansichten/"
+    rel = os.path.relpath(to_node.fs_dir, from_node.fs_dir).replace("\\", "/")
+    if rel == ".":
+        return "./"
+    return rel.rstrip("/") + "/"
 
 
 def absolute_help_path(path: str) -> str:
@@ -819,10 +843,10 @@ def render_page(node: Node) -> str:
     </main>
   </div>
   <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Menü öffnen">&#9776;</button>
-  <script src="/de/help/xlsx-tree.js?v=20260628-kommissionieren-packen-split"></script>
-  <script src="/de/help/ansichten-tree.js?v=20260628-kommissionieren-packen-split"></script>
-  <script src="/de/help/index-tree.js?v=20260628-kommissionieren-packen-split"></script>
-  <script src="/de/help/app.js?v=20260628-kommissionieren-packen-split"></script>
+  <script src="/de/help/xlsx-tree.js?v={ASSET_VERSION}"></script>
+  <script src="/de/help/ansichten-tree.js?v={ASSET_VERSION}"></script>
+  <script src="/de/help/index-tree.js?v={ASSET_VERSION}"></script>
+  <script src="/de/help/app.js?v={ASSET_VERSION}"></script>
 </body>
 </html>
 """

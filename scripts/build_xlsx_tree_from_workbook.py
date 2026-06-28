@@ -77,6 +77,21 @@ def make_node(row: int, level: int, values: dict[str, object]) -> dict[str, obje
     breadcrumb = cell_text(values.get("BREADCRUMB"))
     if breadcrumb:
         node["breadcrumb"] = breadcrumb
+    screenshot = cell_text(values.get("Screenshot"))
+    screenshot_web_path = cell_text(values.get("SCREENSHOT_WEB_PATH"))
+    image_alt = cell_text(values.get("IMAGE_ALT"))
+    image_caption = cell_text(values.get("IMAGE_CAPTION"))
+    image_status = cell_text(values.get("IMAGE_STATUS"))
+    if screenshot:
+        node["screenshot"] = screenshot
+    if screenshot_web_path:
+        node["screenshotWebPath"] = screenshot_web_path
+    if image_alt:
+        node["imageAlt"] = image_alt
+    if image_caption:
+        node["imageCaption"] = image_caption
+    if image_status:
+        node["imageStatus"] = image_status
     return node
 
 
@@ -103,8 +118,7 @@ def main() -> None:
     if missing:
         raise RuntimeError(f"Missing required headers: {', '.join(missing)}")
 
-    roots: list[dict[str, object]] = []
-    stack: dict[int, dict[str, object]] = {}
+    nodes: list[dict[str, object]] = []
 
     for row in range(2, ws.max_row + 1):
         topic = cell_text(ws.cell(row, headers["Thema"]).value)
@@ -115,13 +129,31 @@ def main() -> None:
         values = {name: ws.cell(row, col).value for name, col in headers.items()}
         content_type = cell_text(values.get("CONTENT_TYPE"))
         if content_type == "InlineSection":
-            for key in list(stack):
-                if key >= level:
-                    stack.pop(key, None)
             continue
         node = make_node(row, level, values)
+        nodes.append(node)
 
-        parent = stack.get(level - 1)
+    roots: list[dict[str, object]] = []
+    stack: dict[int, dict[str, object]] = {}
+    by_breadcrumb = {
+        cell_text(node.get("breadcrumb")): node
+        for node in nodes
+        if cell_text(node.get("breadcrumb"))
+    }
+
+    for node in nodes:
+        level = int(node.get("sourceLevel") or 0)
+        breadcrumb = cell_text(node.get("breadcrumb"))
+        parent = None
+        if ">" in breadcrumb:
+            parent_breadcrumb = " > ".join(part.strip() for part in breadcrumb.split(">")[:-1])
+            parent = by_breadcrumb.get(parent_breadcrumb)
+            if parent is node:
+                parent = None
+
+        if parent is None or level == 0:
+            parent = stack.get(level - 1)
+
         if parent is None or level == 0:
             roots.append(node)
         else:

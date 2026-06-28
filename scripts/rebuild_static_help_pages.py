@@ -9,9 +9,10 @@ from urllib.parse import quote, unquote
 
 HELP_ROOT = Path(r"D:\DATEN\HOMEPAGES\x-erp.de\de\help")
 TREE_JSON = HELP_ROOT / "xlsx-tree.json"
-SCRIPT_VERSION = "20260628-logout-after-assistent"
-HELP_CSS_VERSION = "20260628-static-help-boxes"
+SCRIPT_VERSION = "20260628-stammdaten-quality"
+HELP_CSS_VERSION = "20260628-stammdaten-quality"
 CSS_VERSION = "20260627-screenshot-width"
+REDIRECTS = {}
 
 
 def segment_title(segment: str) -> str:
@@ -196,6 +197,8 @@ def markdown_to_html(markdown: str, page_title: str, link_index: dict[str, str] 
     numbered_items: list[str] = []
     box_title: str | None = None
     box_lines: list[str] = []
+    flow_title: str | None = None
+    flow_lines: list[str] = []
     first_heading_seen = False
 
     def flush_paragraph() -> None:
@@ -228,6 +231,29 @@ def markdown_to_html(markdown: str, page_title: str, link_index: dict[str, str] 
             box_title = None
             box_lines = []
 
+    def flush_flow() -> None:
+        nonlocal flow_title, flow_lines
+        if flow_title is not None:
+            items: list[str] = []
+            for raw_item in flow_lines:
+                item = raw_item.strip()
+                item = re.sub(r"^(?:[-*]|\d+[.)])\s*", "", item).strip()
+                if not item:
+                    continue
+                if ":" in item:
+                    head, body = item.split(":", 1)
+                    items.append(
+                        f"<li><strong>{inline_markup(head.strip(), link_index)}</strong><span>{inline_markup(body.strip(), link_index)}</span></li>"
+                    )
+                else:
+                    items.append(f"<li><strong>{inline_markup(item, link_index)}</strong></li>")
+            body = "".join(items)
+            chunks.append(
+                f'<section class="static-help-flow"><h3>{inline_markup(flow_title, link_index)}</h3><ol>{body}</ol></section>'
+            )
+            flow_title = None
+            flow_lines = []
+
     for raw_line in lines:
         line = raw_line.strip()
         if box_title is not None:
@@ -235,6 +261,12 @@ def markdown_to_html(markdown: str, page_title: str, link_index: dict[str, str] 
                 flush_box()
             else:
                 box_lines.append(raw_line)
+            continue
+        if flow_title is not None:
+            if line == ":::":
+                flush_flow()
+            else:
+                flow_lines.append(raw_line)
             continue
         if not line:
             flush_paragraph()
@@ -248,6 +280,14 @@ def markdown_to_html(markdown: str, page_title: str, link_index: dict[str, str] 
             flush_numbered()
             box_title = box.group(1).strip()
             box_lines = []
+            continue
+        flow = re.match(r"^:::flow\s+(.+)$", line)
+        if flow:
+            flush_paragraph()
+            flush_bullets()
+            flush_numbered()
+            flow_title = flow.group(1).strip()
+            flow_lines = []
             continue
         if re.fullmatch(r"-{3,}", line):
             flush_paragraph()
@@ -304,6 +344,7 @@ def markdown_to_html(markdown: str, page_title: str, link_index: dict[str, str] 
     flush_bullets()
     flush_numbered()
     flush_box()
+    flush_flow()
     return "\n".join(chunks) or "<p>Dieser Abschnitt wird redaktionell vorbereitet.</p>"
 
 
@@ -360,12 +401,39 @@ def render_child_cards(node: dict | None) -> str:
         <section class="help-view-panel view-page-section">
           <div class="help-view-section-head">
             <h2>Unterseiten</h2>
-            <p>Diese Abschnitte gehören fachlich zu diesem Bereich und folgen der Struktur aus der Excel-Hilfe.</p>
+            <p>Diese Abschnitte gehören fachlich zu diesem Bereich und führen zu den passenden Detailseiten.</p>
           </div>
           <div class="view-card-grid">
             {''.join(cards)}
           </div>
         </section>'''
+
+
+def absolute_screenshot_path(node: dict | None) -> str:
+    if not node:
+        return ""
+    path = repair_text(node.get("screenshotWebPath") or node.get("screenshot") or "").strip()
+    if not path:
+        return ""
+    path = path.replace("\\", "/")
+    if path.startswith("http://") or path.startswith("https://"):
+        return path
+    if path.startswith("/de/help/"):
+        return path
+    return "/de/help/" + path.lstrip("/")
+
+
+def render_screenshot(node: dict | None, title: str) -> str:
+    src = absolute_screenshot_path(node)
+    if not src:
+        return ""
+    alt = repair_text((node or {}).get("imageAlt") or f"Screenshot {title} in X-ERP").strip()
+    caption = repair_text((node or {}).get("imageCaption") or title).strip()
+    return f'''
+        <figure class="help-view-shot view-screenshot-figure static-help-screenshot">
+          <a class="lightbox" href="{html.escape(src)}"><img src="{html.escape(src)}" alt="{html.escape(alt)}" loading="lazy"></a>
+          <figcaption>{html.escape(caption)}</figcaption>
+        </figure>'''
 
 
 def render_json_ld(title: str, description: str, canonical_url: str, breadcrumbs: list[tuple[str, str]]) -> str:
@@ -406,6 +474,7 @@ def render_page(node: dict | None, rel_dir: Path, link_index: dict[str, str], ti
     breadcrumbs = breadcrumb_items(node or {}, title, canonical_path, title_by_path)
     content_html = markdown_to_html(content_source, title, link_index)
     child_cards = render_child_cards(node)
+    screenshot_html = render_screenshot(node, title)
     breadcrumb_html = render_breadcrumb(breadcrumbs)
     schema = render_json_ld(f"{title} | X-ERP ERP Hilfe", description, canonical_url, breadcrumbs)
 
@@ -451,6 +520,7 @@ def render_page(node: dict | None, rel_dir: Path, link_index: dict[str, str], ti
           </div>
         </section>
 
+        {screenshot_html}
         <section class="help-view-panel view-page-section static-help-content">
           {content_html}
         </section>
@@ -462,6 +532,34 @@ def render_page(node: dict | None, rel_dir: Path, link_index: dict[str, str], ti
   <script src="/de/help/ansichten-tree.js?v={SCRIPT_VERSION}"></script>
   <script src="/de/help/index-tree.js?v={SCRIPT_VERSION}"></script>
   <script src="/de/help/app.js?v={SCRIPT_VERSION}"></script>
+</body>
+</html>
+'''
+
+
+def render_home_page(vorwort_node: dict, link_index: dict[str, str], title_by_path: dict[str, str]) -> str:
+    home_node = dict(vorwort_node)
+    home_node["path"] = "/de/help/"
+    home_node["breadcrumb"] = "Vorwort"
+    return render_page(home_node, Path("."), link_index, title_by_path)
+
+
+def render_redirect_page(target_url: str) -> str:
+    escaped_target = html.escape(target_url, quote=True)
+    json_target = json.dumps(target_url, ensure_ascii=False)
+    return f'''<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
+  <meta http-equiv="refresh" content="0; url={escaped_target}">
+  <link rel="canonical" href="{escaped_target}">
+  <title>Weiterleitung zu Multi-Monitor | X-ERP ERP Hilfe</title>
+  <script>location.replace({json_target});</script>
+</head>
+<body>
+  <p><a href="{escaped_target}">Weiter zu Multi-Monitor</a></p>
 </body>
 </html>
 '''
@@ -506,7 +604,9 @@ def main() -> None:
     for normalized, node in by_path.items():
         if not normalized.startswith("/de/help/"):
             continue
-        if "/ansichten/" in normalized.casefold():
+        if "/ansichten/" in normalized.casefold() and (
+            node.get("contentType") != "HelpPage" or int(node.get("sourceLevel") or 0) < 4
+        ):
             continue
         rel_file = normalized.removeprefix("/de/help/").lstrip("/")
         if normalized.endswith("/"):
@@ -518,8 +618,25 @@ def main() -> None:
         html_file.write_text(render_page(node, html_file.parent.relative_to(HELP_ROOT), link_index, title_by_path), encoding="utf-8", newline="\n")
         written_html += 1
 
+    vorwort_node = by_path.get("/de/help/Vorwort/")
+    if vorwort_node:
+        (HELP_ROOT / "index.html").write_text(
+            render_home_page(vorwort_node, link_index, title_by_path),
+            encoding="utf-8",
+            newline="\n",
+        )
+        written_html += 1
+
+    written_redirects = 0
+    for source, target in REDIRECTS.items():
+        redirect_file = HELP_ROOT / source.strip("/").replace("\\", "/") / "index.html"
+        redirect_file.parent.mkdir(parents=True, exist_ok=True)
+        redirect_file.write_text(render_redirect_page(target), encoding="utf-8", newline="\n")
+        written_redirects += 1
+
     print(f"rewritten_static_pages={rewritten}")
     print(f"written_html_pages={written_html}")
+    print(f"written_redirects={written_redirects}")
 
 
 if __name__ == "__main__":
