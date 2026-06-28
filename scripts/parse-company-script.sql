@@ -1,0 +1,6 @@
+SET PARSEONLY ON
+GO
+:r C:\X-ERP\X-IMPORT\Company-Script.sql
+GO
+SET PARSEONLY OFF
+GO

@@ -1,0 +1,14 @@
+ARCHIV/
+outputs/
+tools/
+.agents/
+.codex_spreadsheet_work/
+__pycache__/
+*.tmp
+~$*
+26716830
+66C65B30
+71F16630
+E8BFF330
+EFBCF330
+X-ERP-HELP.before-*.xlsx
